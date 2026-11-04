@@ -15,10 +15,10 @@ router = APIRouter(prefix="/api/enrolamiento", tags=["Enrolamiento"])
 @router.post("/muestra", dependencies=[Depends(requiere_rol(*GESTION))])
 def validar_muestra(datos: Imagen):
     try:
-        periorbital.generar_embedding(datos.imagen)
+        _, encuadre = periorbital.analizar_muestra(datos.imagen)
     except periorbital.ErrorCaptura as error:
         return {"valida": False, "mensaje": str(error)}
-    return {"valida": True, "mensaje": "Muestra aceptada."}
+    return {"valida": True, "mensaje": "Muestra aceptada.", "encuadre": encuadre}
 
 
 @router.post("", response_model=ColaboradorSalida, status_code=status.HTTP_201_CREATED)

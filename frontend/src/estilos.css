@@ -214,3 +214,170 @@ input:disabled { background: var(--fondo); color: var(--texto-suave); }
 @media (prefers-reduced-motion: reduce) {
   .barra div { transition: none; }
 }
+
+/* Guía visual de enrolamiento */
+.encabezado-captura { display: flex; justify-content: space-between; align-items: baseline; }
+.solo-lector {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.guia-enrol { position: absolute; inset: 0; pointer-events: none; --guia-acento: #5fb6bf; }
+.guia-lienzo { width: 100%; height: 100%; display: block; }
+
+.guia-sombra { fill: rgba(8, 28, 31, 0.42); transition: opacity 0.4s ease; }
+.fase-inactiva .guia-sombra { fill: rgba(8, 28, 31, 0.6); }
+
+.guia-banda {
+  fill: rgba(255, 255, 255, 0.07);
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: 2;
+  stroke-dasharray: 6 9;
+}
+
+.guia-ovalo {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 4;
+  stroke-dasharray: 14 12;
+  transition: stroke 0.3s ease, opacity 0.3s ease;
+}
+.fase-cuenta .guia-ovalo { stroke: rgba(255, 255, 255, 0.3); stroke-dasharray: none; }
+.fase-validando .guia-ovalo { stroke: var(--guia-acento); stroke-dasharray: none; animation: guia-pulso 0.9s ease-in-out infinite alternate; }
+.fase-aceptada .guia-ovalo, .fase-completa .guia-ovalo { stroke: #6cc070; stroke-dasharray: none; }
+.fase-rechazada .guia-ovalo { stroke: var(--pendiente); stroke-dasharray: none; }
+
+.guia-progreso {
+  fill: none;
+  stroke: var(--guia-acento);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: guia-llenar linear forwards;
+}
+
+.guia-check { animation: guia-aparecer 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.2) both; }
+.guia-check circle { fill: rgba(63, 145, 66, 0.92); }
+.guia-check path {
+  fill: none; stroke: #fff; stroke-width: 9; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 100; stroke-dashoffset: 100;
+  animation: guia-trazo 0.35s ease-out 0.15s forwards;
+}
+
+.guia-tarjeta {
+  position: absolute;
+  left: 50%; bottom: 4%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 88%;
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.55rem 0.9rem 0.55rem 0.6rem;
+  border-radius: 14px;
+  background: rgba(12, 36, 40, 0.82);
+  color: #fff;
+}
+.guia-mensaje {
+  display: flex; align-items: center; gap: 0.7rem;
+  font-family: 'Manrope', 'Inter', sans-serif;
+  font-weight: 600; font-size: 1rem; line-height: 1.3;
+  animation: guia-entrada 0.35s ease-out both;
+}
+.fase-inactiva .guia-mensaje, .fase-aceptada .guia-mensaje, .fase-completa .guia-mensaje { padding-left: 0.4rem; }
+.guia-numero {
+  display: grid; place-items: center; flex-shrink: 0;
+  width: 2.3rem; height: 2.3rem; border-radius: 50%;
+  border: 2px solid var(--guia-acento);
+  font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 1.15rem;
+  animation: guia-numero 0.4s ease-out both;
+}
+.guia-validando {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  border-top-color: var(--guia-acento);
+  animation: guia-girar 0.8s linear infinite;
+}
+
+/* Ícono de pose */
+.icono-pose { flex-shrink: 0; overflow: visible; }
+.icono-pose * { transform-box: fill-box; transform-origin: center; }
+.ip-contorno { fill: rgba(255, 255, 255, 0.12); stroke: #fff; stroke-width: 2; }
+.ip-ceja, .ip-nariz { fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ip-ojos ellipse { fill: #fff; }
+.ip-flecha { fill: none; stroke: #9fd8de; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+.ip-anillo { fill: none; stroke: #9fd8de; stroke-width: 2.2; stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0; }
+
+.pose-frente .ip-ojos ellipse { animation: ip-parpadeo 3.2s ease-in-out infinite; }
+
+/* La vista es espejo: el giro a la derecha del colaborador se ve hacia la derecha de la pantalla. */
+.pose-derecha .ip-rasgos { transform: translateX(4px); animation: ip-girar-der 2.2s ease-in-out infinite; }
+.pose-derecha .ip-contorno { animation: ip-estrechar 2.2s ease-in-out infinite; }
+.pose-derecha .ip-flecha-der { opacity: 1; animation: ip-flecha 2.2s ease-in-out infinite; }
+.pose-izquierda .ip-rasgos { transform: translateX(-4px); animation: ip-girar-izq 2.2s ease-in-out infinite; }
+.pose-izquierda .ip-contorno { animation: ip-estrechar 2.2s ease-in-out infinite; }
+.pose-izquierda .ip-flecha-izq { opacity: 1; animation: ip-flecha 2.2s ease-in-out infinite; }
+
+.pose-quieto .ip-anillo { opacity: 1; stroke-dashoffset: 0; animation: ip-anillo 2s linear infinite; }
+.pose-acercar .ip-cabeza { animation: ip-acercar 1.8s ease-in-out infinite; }
+.pose-alejar .ip-cabeza { animation: ip-alejar 1.8s ease-in-out infinite; }
+.pose-centrar .ip-cabeza { animation: ip-centrar 2s ease-in-out infinite; }
+
+/* Progreso de las cinco capturas */
+.pasos-captura { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); }
+.pasos-captura li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+.pasos-captura li + li::before {
+  content: ''; position: absolute; top: 13px; right: 50%; width: 100%; height: 2px;
+  background: var(--borde); z-index: 0;
+}
+.pasos-captura li.paso-hecho + li::before { background: var(--exito); }
+.paso-marca {
+  position: relative; z-index: 1;
+  display: grid; place-items: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--superficie); border: 2px solid var(--borde);
+  font-size: 0.78rem; font-weight: 600; color: var(--texto-suave);
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+.paso-texto { font-size: 0.76rem; color: var(--texto-suave); }
+.paso-actual .paso-marca { border-color: var(--primario); color: var(--primario); box-shadow: 0 0 0 4px rgba(27, 107, 117, 0.14); }
+.paso-actual .paso-texto { color: var(--primario); font-weight: 600; }
+.paso-hecho .paso-marca { background: var(--exito); border-color: var(--exito); }
+.paso-hecho .paso-marca::after {
+  content: ''; width: 9px; height: 5px; margin-top: -2px;
+  border-left: 2px solid #fff; border-bottom: 2px solid #fff;
+  transform: rotate(-45deg);
+}
+.paso-hecho .paso-texto { color: var(--texto); }
+
+@keyframes guia-llenar { to { stroke-dashoffset: 0; } }
+@keyframes guia-pulso { from { opacity: 1; } to { opacity: 0.45; } }
+@keyframes guia-aparecer { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+@keyframes guia-trazo { to { stroke-dashoffset: 0; } }
+@keyframes guia-entrada { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes guia-numero { from { opacity: 0; transform: scale(1.3); } to { opacity: 1; transform: scale(1); } }
+@keyframes guia-girar { to { transform: rotate(360deg); } }
+
+@keyframes ip-parpadeo { 0%, 44%, 52%, 100% { transform: scaleY(1); } 48% { transform: scaleY(0.12); } }
+@keyframes ip-girar-der { 0%, 12%, 100% { transform: translateX(0); } 42%, 72% { transform: translateX(5px); } }
+@keyframes ip-girar-izq { 0%, 12%, 100% { transform: translateX(0); } 42%, 72% { transform: translateX(-5px); } }
+@keyframes ip-estrechar { 0%, 12%, 100% { transform: scaleX(1); } 42%, 72% { transform: scaleX(0.93); } }
+@keyframes ip-flecha { 0%, 12%, 100% { opacity: 0.25; } 42%, 72% { opacity: 1; } }
+@keyframes ip-anillo { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+@keyframes ip-acercar { 0%, 100% { transform: scale(0.86); } 50% { transform: scale(1.08); } }
+@keyframes ip-alejar { 0%, 100% { transform: scale(1.08); } 50% { transform: scale(0.86); } }
+@keyframes ip-centrar { 0%, 100% { transform: translateX(-7px); } 45%, 70% { transform: translateX(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .guia-enrol *, .icono-pose *, .paso-marca { animation: none !important; transition: none !important; }
+  .guia-progreso { display: none; }
+  .fase-cuenta .guia-ovalo { stroke: var(--guia-acento); }
+  .guia-check path { stroke-dashoffset: 0; }
+}
+
+@media (max-width: 600px) {
+  .guia-tarjeta { gap: 0.6rem; padding: 0.35rem 0.6rem 0.35rem 0.4rem; bottom: 3%; }
+  .guia-mensaje { font-size: 0.8rem; gap: 0.45rem; }
+  .icono-pose { width: 34px; height: 34px; }
+  .guia-numero { width: 1.8rem; height: 1.8rem; font-size: 0.95rem; }
+  .paso-texto { font-size: 0.7rem; }
+}

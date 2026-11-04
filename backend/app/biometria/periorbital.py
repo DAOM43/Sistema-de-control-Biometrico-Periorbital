@@ -74,7 +74,8 @@ def _aislar_region_periorbital(rgb: np.ndarray, puntos: dict) -> np.ndarray:
     return np.ascontiguousarray(enmascarada)
 
 
-def generar_embedding(imagen_b64: str) -> np.ndarray:
+def analizar_muestra(imagen_b64: str) -> tuple[np.ndarray, dict]:
+    """Devuelve el embedding y la posición del rostro, en proporciones de 0 a 1 de la imagen."""
     bgr = decodificar_imagen(imagen_b64)
     rgb = _normalizar_iluminacion(bgr)
     ubicacion = _localizar_rostro(rgb)
@@ -87,7 +88,18 @@ def generar_embedding(imagen_b64: str) -> np.ndarray:
     arriba, derecha, abajo, izquierda = ubicacion
     forma = _predictor_5(rgb, dlib.rectangle(izquierda, arriba, derecha, abajo))
     descriptor = _codificador.compute_face_descriptor(region, forma, 1)
-    return np.asarray(descriptor, dtype=np.float64)
+
+    alto, ancho = bgr.shape[:2]
+    ojos = puntos["left_eye"] + puntos["right_eye"]
+    encuadre = {
+        "rostro": [izquierda / ancho, arriba / alto, derecha / ancho, abajo / alto],
+        "ojos": [sum(x for x, _ in ojos) / len(ojos) / ancho, sum(y for _, y in ojos) / len(ojos) / alto],
+    }
+    return np.asarray(descriptor, dtype=np.float64), encuadre
+
+
+def generar_embedding(imagen_b64: str) -> np.ndarray:
+    return analizar_muestra(imagen_b64)[0]
 
 
 def consolidar_muestras(embeddings: list[np.ndarray]) -> np.ndarray:

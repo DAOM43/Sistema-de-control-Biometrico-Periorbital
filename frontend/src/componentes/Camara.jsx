@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 're
 
 const ANCHO_CAPTURA = 960
 
-const Camara = forwardRef(function Camara({ onEstado }, ref) {
+const Camara = forwardRef(function Camara({ onEstado, children }, ref) {
   const video = useRef(null)
   const [error, setError] = useState('')
 
@@ -49,6 +49,11 @@ const Camara = forwardRef(function Camara({ onEstado }, ref) {
       lienzo.getContext('2d').drawImage(v, 0, 0, lienzo.width, lienzo.height)
       return lienzo.toDataURL('image/jpeg', 0.92)
     },
+    geometria() {
+      const v = video.current
+      if (!v || !v.videoWidth) return null
+      return { videoAncho: v.videoWidth, videoAlto: v.videoHeight, vistaAncho: v.clientWidth, vistaAlto: v.clientHeight }
+    },
   }))
 
   return (
@@ -58,7 +63,7 @@ const Camara = forwardRef(function Camara({ onEstado }, ref) {
       ) : (
         <>
           <video ref={video} autoPlay playsInline muted />
-          <div className="guia" aria-hidden="true" />
+          {children ?? <div className="guia" aria-hidden="true" />}
         </>
       )}
     </div>
