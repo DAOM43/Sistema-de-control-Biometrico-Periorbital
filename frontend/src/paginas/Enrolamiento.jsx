@@ -36,6 +36,7 @@ export default function Enrolamiento() {
   const [segundos, setSegundos] = useState(SEGUNDOS_CUENTA)
   const [claveCuenta, setClaveCuenta] = useState(0)
   const [correccion, setCorreccion] = useState(null)
+  const [parecido, setParecido] = useState(null)
 
   const actualizar = (campo) => (e) => {
     setDatos({ ...datos, [campo]: e.target.value })
@@ -125,12 +126,22 @@ export default function Enrolamiento() {
     return () => clearTimeout(id)
   }, [fase, muestras.length])
 
-  async function finalizar() {
+  async function finalizar(confirmarParecido = false) {
     setProcesando(true)
     try {
-      await api.post('/api/enrolamiento', { ...datos, codigo: datos.codigo.trim().toUpperCase(), muestras })
+      await api.post('/api/enrolamiento', {
+        ...datos,
+        codigo: datos.codigo.trim().toUpperCase(),
+        muestras,
+        confirmar_parecido: confirmarParecido,
+      })
       navegar('/personal', { state: { aviso: `${datos.nombre} fue enrolado correctamente.` } })
     } catch (e) {
+      if (e.detalle?.codigo === 'rostro_parecido') {
+        // Se conservan las muestras para que el administrador pueda confirmar sin repetir capturas.
+        setParecido(e.detalle)
+        return
+      }
       setMuestras([])
       setFase('esperando')
       setMensaje({ tipo: 'alerta', texto: `${e.message} Las muestras se reiniciaron.` })
@@ -142,6 +153,7 @@ export default function Enrolamiento() {
   function repetirCapturas() {
     setMuestras([])
     setCorreccion(null)
+    setParecido(null)
     setFase('esperando')
   }
 
@@ -151,6 +163,7 @@ export default function Enrolamiento() {
     setDatosConfirmados(false)
     setMuestras([])
     setCorreccion(null)
+    setParecido(null)
     setFase('inactiva')
     setMensaje(null)
   }
@@ -223,6 +236,7 @@ export default function Enrolamiento() {
           <p className="aviso alerta">No es posible enrolar sin cámara. Verifique la conexión del dispositivo.</p>
         )}
         {mensaje && <p className={`aviso ${mensaje.tipo}`} role="status">{mensaje.texto}</p>}
+        {parecido && <p className="aviso pendiente" role="alert">{parecido.mensaje}</p>}
 
         <div className="acciones">
           {(fase === 'inactiva' || fase === 'esperando') && (
@@ -249,14 +263,27 @@ export default function Enrolamiento() {
             </button>
           )}
 
-          {fase === 'completa' && (
+          {fase === 'completa' && !parecido && (
             <>
               <button type="button" className="boton secundario" onClick={repetirCapturas} disabled={procesando}>
                 Repetir capturas
               </button>
-              <button type="button" className="boton primario" onClick={finalizar} disabled={procesando}>
+              <button type="button" className="boton primario" onClick={() => finalizar()} disabled={procesando}>
                 {procesando ? 'Generando patrón...' : 'Finalizar enrolamiento'}
               </button>
+            </>
+          )}
+
+          {fase === 'completa' && parecido && (
+            <>
+              <button type="button" className="boton secundario" onClick={cancelar} disabled={procesando}>
+                Cancelar enrolamiento
+              </button>
+              {parecido.puede_confirmar && (
+                <button type="button" className="boton primario" onClick={() => finalizar(true)} disabled={procesando}>
+                  {procesando ? 'Registrando...' : 'Son personas distintas, registrar'}
+                </button>
+              )}
             </>
           )}
         </div>

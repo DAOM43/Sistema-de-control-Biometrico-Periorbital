@@ -33,8 +33,17 @@ class ColaboradorSalida(BaseModel):
     estado: str
 
 
+class ColaboradorEdicion(BaseModel):
+    nombre: str = Field(min_length=3, max_length=150)
+    puesto: str = Field(min_length=2, max_length=100)
+
+
 class Imagen(BaseModel):
     imagen: str = Field(description="Imagen JPEG en base64 o data URL")
+
+
+class SolicitudMarcaje(Imagen):
+    codigo: str = Field(min_length=2, max_length=20)
 
 
 class Enrolamiento(BaseModel):
@@ -42,6 +51,7 @@ class Enrolamiento(BaseModel):
     nombre: str = Field(min_length=3, max_length=150)
     puesto: str = Field(min_length=2, max_length=100)
     muestras: list[str] = Field(min_length=5, max_length=5)
+    confirmar_parecido: bool = False
 
 
 class ResultadoMarcaje(BaseModel):
@@ -82,7 +92,3 @@ class MarcajeManual(BaseModel):
     fecha: date
     hora: time
     observacion: str = Field(min_length=5)
-
-class ColaboradorEdicion(BaseModel):
-    nombre: str = Field(min_length=3, max_length=150)
-    puesto: str = Field(min_length=2, max_length=100)

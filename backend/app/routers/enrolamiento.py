@@ -7,9 +7,28 @@ from app.database import obtener_sesion
 from app.models import Colaborador, PatronBiometrico, Usuario
 from app.schemas import ColaboradorSalida, Enrolamiento, Imagen
 from app.security import GESTION, requiere_rol
-from app.servicios import configuracion_vigente, patrones_vigentes
+from app.servicios import configuracion_vigente
 
 router = APIRouter(prefix="/api/enrolamiento", tags=["Enrolamiento"])
+
+LIMITE_CONFIRMACION = 0.85
+
+
+def _mensaje_parecido(existente: Colaborador, puntaje: float, confirmable: bool, es_administrador: bool) -> str:
+    mensaje = f"El rostro se parece a {existente.nombre} ({existente.codigo}), con {puntaje:.0%} de confianza."
+    if not confirmable:
+        if existente.estado == "inactivo":
+            return mensaje + " Es la misma persona y está inactiva: reactívela desde Personal."
+        return mensaje + " Es la misma persona: no puede registrarse con otro código."
+    if es_administrador:
+        return mensaje + " Si verificó en persona que son personas distintas, puede confirmar el registro."
+    return mensaje + " Solo un administrador puede confirmar que son personas distintas."
+
+
+def _patrones_registrados(sesion: Session) -> list[tuple[int, bytes]]:
+    # Incluye inactivos: una persona desactivada no debe poder registrarse de nuevo con otro código.
+    filas = sesion.execute(select(PatronBiometrico.colaborador_id, PatronBiometrico.embedding)).all()
+    return [(fila[0], fila[1]) for fila in filas]
 
 
 @router.post("/muestra", dependencies=[Depends(requiere_rol(*GESTION))])
@@ -38,13 +57,20 @@ def enrolar(
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error))
 
     umbral = float(configuracion_vigente(sesion).umbral_reconocimiento)
-    existente_id, puntaje = periorbital.mejor_coincidencia(patron, patrones_vigentes(sesion))
+    existente_id, puntaje = periorbital.mejor_coincidencia(patron, _patrones_registrados(sesion))
     if existente_id and puntaje >= umbral:
         existente = sesion.get(Colaborador, existente_id)
-        raise HTTPException(
-            status.HTTP_409_CONFLICT,
-            f"El patrón capturado coincide con {existente.nombre} ({existente.codigo}).",
-        )
+        # Un parecido muy alto es casi con certeza la misma persona: no se permite confirmar.
+        confirmable = puntaje < LIMITE_CONFIRMACION
+        es_administrador = usuario.rol == "administrador"
+        if not (datos.confirmar_parecido and confirmable and es_administrador):
+            raise HTTPException(status.HTTP_409_CONFLICT, detail={
+                "codigo": "rostro_parecido",
+                "mensaje": _mensaje_parecido(existente, puntaje, confirmable, es_administrador),
+                "coincide_con": {"codigo": existente.codigo, "nombre": existente.nombre, "estado": existente.estado},
+                "confianza": puntaje,
+                "puede_confirmar": confirmable and es_administrador,
+            })
 
     colaborador = Colaborador(
         codigo=codigo,

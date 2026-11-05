@@ -31,8 +31,15 @@ async function solicitar(metodo, ruta, cuerpo) {
 
   const datos = await respuesta.json().catch(() => null)
   if (!respuesta.ok) {
-    const detalle = Array.isArray(datos?.detail) ? 'Revise los datos ingresados.' : datos?.detail
-    throw new Error(detalle || 'No fue posible completar la operación.')
+    const detalle = datos?.detail
+    let mensaje = 'No fue posible completar la operación.'
+    if (typeof detalle === 'string') mensaje = detalle
+    else if (Array.isArray(detalle)) mensaje = 'Revise los datos ingresados.'
+    else if (detalle?.mensaje) mensaje = detalle.mensaje
+    // Conserva el detalle completo cuando el backend envía datos adicionales.
+    const error = new Error(mensaje)
+    error.detalle = detalle
+    throw error
   }
   return datos
 }

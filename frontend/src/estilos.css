@@ -381,3 +381,32 @@ input:disabled { background: var(--fondo); color: var(--texto-suave); }
   .guia-numero { width: 1.8rem; height: 1.8rem; font-size: 0.95rem; }
   .paso-texto { font-size: 0.7rem; }
 }
+
+/* Marcaje con código (verificación 1 a 1) */
+.entrada-codigo { display: flex; flex-direction: column; gap: 0.75rem; }
+.campo-codigo {
+  font-family: 'Manrope', 'Inter', sans-serif;
+  font-size: 1.35rem; font-weight: 700;
+  letter-spacing: 0.08em; text-align: center;
+  padding: 0.7rem;
+}
+.teclado { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; }
+.tecla {
+  font: inherit; font-size: 1rem; font-weight: 600;
+  padding: 0.6rem 0;
+  border: 1px solid var(--borde); border-radius: 8px;
+  background: var(--fondo); color: var(--texto);
+  cursor: pointer;
+}
+.tecla:hover { background: #e9efee; }
+.tecla:active { background: #dde6e5; }
+
+.identidad {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  background: #eef3f3;
+  border-left: 4px solid var(--primario);
+}
+.identidad > div { display: flex; flex-direction: column; flex: 1; font-size: 0.9rem; }
+.identidad .sutil { font-size: 0.8rem; }
