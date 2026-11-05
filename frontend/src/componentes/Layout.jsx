@@ -4,12 +4,16 @@ const TITULOS = {
   '/marcaje': 'Marcaje',
   '/enrolamiento': 'Enrolamiento',
   '/personal': 'Personal',
+  '/contingencia': 'Contingencia',
+  '/reportes': 'Reportes',
 }
 
 const ICONOS = {
   marcaje: 'M12 8v4l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z',
   enrolamiento: 'M15 19a6 6 0 0 0-12 0M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M22 11h-6',
   personal: 'M17 20a5 5 0 0 0-10 0M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM21 20a4 4 0 0 0-3-3.9M3 20a4 4 0 0 1 3-3.9',
+  contingencia: 'M9 4h6v3H9zM9 5H6v16h12V5h-3M9 12h6M9 16h4',
+  reportes: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
 }
 
 function Icono({ ruta }) {
@@ -52,6 +56,8 @@ export default function Layout({ usuario, puedeGestionar, onSalir }) {
           <NavLink to="/marcaje"><Icono ruta={ICONOS.marcaje} />Marcaje</NavLink>
           {puedeGestionar && <NavLink to="/enrolamiento"><Icono ruta={ICONOS.enrolamiento} />Enrolamiento</NavLink>}
           {puedeGestionar && <NavLink to="/personal"><Icono ruta={ICONOS.personal} />Personal</NavLink>}
+          {puedeGestionar && <NavLink to="/contingencia"><Icono ruta={ICONOS.contingencia} />Contingencia</NavLink>}
+          {puedeGestionar && <NavLink to="/reportes"><Icono ruta={ICONOS.reportes} />Reportes</NavLink>}
         </nav>
 
         <p className="version">v0.1 MVP</p>

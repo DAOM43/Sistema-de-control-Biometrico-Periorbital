@@ -80,5 +80,7 @@ def reporte(
             umbral_confianza=float(m.umbral_confianza) if m.umbral_confianza is not None else None,
             es_prueba=m.es_prueba,
             observacion_horario=evaluacion.detalle,
+            en_horario=evaluacion.en_horario,
+            minutos_horario=evaluacion.minutos,
         ))
     return resultado

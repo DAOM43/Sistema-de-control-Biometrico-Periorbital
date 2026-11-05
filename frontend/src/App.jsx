@@ -6,6 +6,8 @@ import Login from './paginas/Login.jsx'
 import Marcaje from './paginas/Marcaje.jsx'
 import Enrolamiento from './paginas/Enrolamiento.jsx'
 import Personal from './paginas/Personal.jsx'
+import Contingencia from './paginas/Contingencia.jsx'
+import Reportes from './paginas/Reportes.jsx'
 
 const GESTION = ['administrador', 'personal_administrativo']
 
@@ -39,6 +41,8 @@ export default function App() {
         <Route path="/marcaje" element={<Marcaje />} />
         {puedeGestionar && <Route path="/enrolamiento" element={<Enrolamiento />} />}
         {puedeGestionar && <Route path="/personal" element={<Personal />} />}
+        {puedeGestionar && <Route path="/contingencia" element={<Contingencia />} />}
+        {puedeGestionar && <Route path="/reportes" element={<Reportes />} />}
         <Route path="*" element={<Navigate to="/marcaje" replace />} />
       </Route>
     </Routes>

@@ -410,3 +410,62 @@ input:disabled { background: var(--fondo); color: var(--texto-suave); }
 }
 .identidad > div { display: flex; flex-direction: column; flex: 1; font-size: 0.9rem; }
 .identidad .sutil { font-size: 0.8rem; }
+
+/* Contingencia y reportes */
+select, textarea {
+  font: inherit; font-size: 0.9rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--texto);
+}
+select:focus, textarea:focus { border-color: var(--primario); outline: none; box-shadow: 0 0 0 3px rgba(27, 107, 117, 0.15); }
+textarea { min-height: 76px; resize: vertical; }
+.nota-panel { margin: -0.4rem 0 0; font-size: 0.85rem; }
+
+.dos-columnas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.8rem; }
+.dos-columnas input { width: 100%; }
+
+.campo-grupo { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.85rem; font-weight: 500; }
+.segmentado { display: flex; border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; }
+.segmentado button {
+  flex: 1; font: inherit; font-size: 0.88rem; font-weight: 600;
+  padding: 0.55rem; border: none; background: #fff; color: var(--texto); cursor: pointer;
+}
+.segmentado button + button { border-left: 1px solid var(--borde); }
+.segmentado button.activo { background: var(--primario); color: #fff; }
+
+.filtros-reporte {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr) auto;
+  gap: 0.8rem; align-items: end;
+}
+.filtros-reporte input, .filtros-reporte select { width: 100%; }
+
+.totales { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.7rem; }
+.totales div {
+  display: flex; flex-direction: column; gap: 0.15rem;
+  padding: 0.7rem 0.9rem;
+  background: var(--fondo); border: 1px solid var(--borde); border-radius: 8px;
+}
+.totales strong { font-family: 'Manrope', 'Inter', sans-serif; font-size: 1.2rem; }
+.totales span { font-size: 0.78rem; color: var(--texto-suave); }
+
+.tabla-reporte { max-height: 460px; overflow-y: auto; }
+.tabla-reporte thead th { position: sticky; top: 0; background: var(--superficie); }
+.codigo-tabla { display: block; font-size: 0.76rem; color: var(--texto-suave); }
+.capital { text-transform: capitalize; }
+.etiqueta { display: inline-block; margin: 0.1rem 0.3rem 0.1rem 0; padding: 0.1rem 0.55rem; border-radius: 999px; font-size: 0.74rem; font-weight: 600; white-space: nowrap; }
+.etiqueta.biometrico { background: #e5f2e5; color: var(--exito); }
+.etiqueta.manual { background: #fcf5e8; color: #a8711a; }
+.etiqueta.prueba { background: #eef3f3; color: var(--texto-suave); }
+.obs-ok { color: var(--exito); }
+.obs-alerta { color: var(--alerta); }
+.obs-extra { color: var(--primario); }
+.obs-neutra { color: var(--texto-suave); }
+
+@media (max-width: 900px) {
+  .filtros-reporte { grid-template-columns: 1fr 1fr; }
+  .totales { grid-template-columns: 1fr 1fr; }
+}

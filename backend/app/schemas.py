@@ -76,6 +76,9 @@ class MarcacionSalida(BaseModel):
     umbral_confianza: float | None
     es_prueba: bool
     observacion_horario: str
+    en_horario: bool
+    # Entrada: minutos de retardo. Salida: positivos = tiempo extra, negativos = salida anticipada.
+    minutos_horario: int
 
 
 class ResumenDiario(BaseModel):
