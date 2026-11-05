@@ -109,6 +109,19 @@ npm run dev
 
 El sistema se abre en `http://localhost:5173`.
 
+## Ambiente de demostración en la nube
+
+Para pruebas y demostración el sistema se despliega con planes gratuitos. El ambiente de producción es la instalación local en el Centro de Salud.
+
+| Componente | Servicio | Detalle |
+|---|---|---|
+| Base de datos | Neon (PostgreSQL) | Se crea con `database/neon_instalacion.sql` |
+| Aplicación | Render (Docker) | El `Dockerfile` compila el frontend y lo sirve junto con la API en una sola dirección HTTPS |
+
+Variables de entorno en Render: `DATABASE_URL` (cadena de conexión de Neon con el prefijo `postgresql+psycopg://`) y `JWT_SECRETO`.
+
+El plan gratuito de Render suspende el servicio tras 15 minutos sin uso; el primer acceso posterior tarda alrededor de un minuto.
+
 ## Pantallas
 
 | Pantalla | Función |

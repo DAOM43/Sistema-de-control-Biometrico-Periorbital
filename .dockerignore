@@ -1,0 +1,7 @@
+.git
+docs
+backend/venv
+backend/.env
+**/__pycache__
+frontend/node_modules
+frontend/dist
