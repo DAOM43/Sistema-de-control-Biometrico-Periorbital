@@ -3,6 +3,7 @@ import { api } from '../api.js'
 import Camara from '../componentes/Camara.jsx'
 import GuiaEnrolamiento from '../componentes/GuiaEnrolamiento.jsx'
 import { correccionPara } from '../enrolamiento/pasos.js'
+import { formatoHora } from '../utilidades/formato.js'
 
 const INTERVALO_CAPTURA_MS = 1500
 const TIEMPO_MAXIMO_MS = 20000
@@ -15,13 +16,6 @@ const ESTILO_RESULTADO = {
   doble_marcaje: 'pendiente',
   no_reconocido: 'alerta',
   error: 'alerta',
-}
-
-function formatoHora(hora) {
-  if (!hora) return ''
-  const [h, m] = hora.split(':').map(Number)
-  const sufijo = h >= 12 ? 'PM' : 'AM'
-  return `${String(h % 12 || 12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${sufijo}`
 }
 
 function iniciales(nombre) {
@@ -212,7 +206,9 @@ export default function Marcaje() {
           <div className={`aviso ${ESTILO_RESULTADO[resultado.resultado] ?? 'alerta'}`} role="status">
             <strong>{resultado.mensaje}</strong>
             {resultado.hora && <span>{persona.nombre}, {formatoHora(resultado.hora)}</span>}
-            {resultado.confianza != null && <span>Confianza {(resultado.confianza * 100).toFixed(1)}%</span>}
+            {resultado.resultado === 'registrada' && resultado.confianza != null && (
+              <span>Confianza {(resultado.confianza * 100).toFixed(1)}%</span>
+            )}
             {resultado.detalle && <span>{resultado.detalle}</span>}
           </div>
         )}

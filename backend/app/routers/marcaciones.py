@@ -62,6 +62,11 @@ def reporte(
         momento = datetime.combine(m.fecha, m.hora)
         if m.tipo == "entrada":
             entradas[(m.colaborador_id, m.fecha)] = m
+
+        if m.observacion_horario is not None:
+            # Evaluación guardada al marcar: no depende de la configuración actual.
+            evaluacion = horario.Evaluacion(bool(m.en_horario), m.minutos_horario or 0, m.observacion_horario)
+        elif m.tipo == "entrada":
             evaluacion = horario.evaluar_entrada(momento, config)
         else:
             entrada = entradas.get((m.colaborador_id, m.fecha))

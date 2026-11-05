@@ -105,7 +105,7 @@ class MarcajeManual(BaseModel):
     tipo: Literal["entrada", "salida"]
     fecha: date
     hora: time
-    observacion: str = Field(min_length=5)
+    observacion: str = Field(min_length=5, max_length=500)
 
 
 class CambioPassword(BaseModel):

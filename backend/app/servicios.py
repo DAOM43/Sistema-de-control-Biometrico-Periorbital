@@ -55,11 +55,13 @@ def _bloquear_colaborador(sesion: Session, colaborador_id: int) -> None:
     sesion.execute(select(Colaborador.id).where(Colaborador.id == colaborador_id).with_for_update())
 
 
-def _evaluar(tipo: str, momento: datetime, entrada: Marcacion | None, config: Configuracion) -> str:
+def _evaluar(tipo: str, momento: datetime, entrada: Marcacion | None, config: Configuracion) -> horario.Evaluacion:
     if tipo == "entrada":
-        evaluacion = horario.evaluar_entrada(momento, config)
-    else:
-        evaluacion = horario.evaluar_salida(momento, entrada.hora, config)
+        return horario.evaluar_entrada(momento, config)
+    return horario.evaluar_salida(momento, entrada.hora, config)
+
+
+def _detalle(evaluacion: horario.Evaluacion, config: Configuracion) -> str:
     return evaluacion.detalle + (" Registro en modo de pruebas." if config.modo_pruebas else "")
 
 
@@ -88,6 +90,7 @@ def registrar_marcaje_biometrico(
             return ResultadoRegistro(ultima, False, f"Marcación ya realizada a las {ultima.hora:%H:%M}.")
 
     tipo = "salida" if entrada else "entrada"
+    evaluacion = _evaluar(tipo, momento, entrada, config)
     marcacion = Marcacion(
         colaborador_id=colaborador_id,
         fecha=momento.date(),
@@ -96,11 +99,13 @@ def registrar_marcaje_biometrico(
         origen_biometrico=True,
         umbral_confianza=Decimal(str(puntaje)),
         es_prueba=config.modo_pruebas,
+        observacion_horario=evaluacion.detalle,
+        en_horario=evaluacion.en_horario,
+        minutos_horario=evaluacion.minutos,
     )
     _guardar(sesion, marcacion)
-    detalle = _evaluar(tipo, momento, entrada, config)
     sesion.commit()
-    return ResultadoRegistro(marcacion, True, detalle)
+    return ResultadoRegistro(marcacion, True, _detalle(evaluacion, config))
 
 
 def registrar_marcaje_manual(
@@ -121,6 +126,7 @@ def registrar_marcaje_manual(
         sesion.rollback()
         raise ErrorSecuencia(f"La salida no puede ser anterior a la entrada ({entrada.hora:%H:%M}).")
 
+    evaluacion = _evaluar(tipo, momento, entrada, config)
     marcacion = Marcacion(
         colaborador_id=colaborador_id,
         fecha=momento.date(),
@@ -128,6 +134,9 @@ def registrar_marcaje_manual(
         tipo=tipo,
         origen_biometrico=False,
         es_prueba=config.modo_pruebas,
+        observacion_horario=evaluacion.detalle,
+        en_horario=evaluacion.en_horario,
+        minutos_horario=evaluacion.minutos,
     )
     _guardar(sesion, marcacion)
-    return ResultadoRegistro(marcacion, True, _evaluar(tipo, momento, entrada, config))
+    return ResultadoRegistro(marcacion, True, _detalle(evaluacion, config))

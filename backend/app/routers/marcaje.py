@@ -64,7 +64,6 @@ def marcar(datos: SolicitudMarcaje, sesion: Session = Depends(obtener_sesion)):
             resultado="no_reconocido",
             mensaje=f"El rostro no corresponde al código {colaborador.codigo}.",
             colaborador=salida,
-            confianza=puntaje,
         )
 
     try:

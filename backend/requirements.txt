@@ -12,3 +12,7 @@ pillow==11.0.0
 dlib-bin==19.24.6
 face_recognition_models==0.3.0
 setuptools==75.8.0
+
+# face_recognition se instala aparte, sin dependencias, porque exige compilar dlib
+# y en Windows ya se usa dlib-bin (precompilado):
+#   pip install face_recognition==1.3.0 --no-deps

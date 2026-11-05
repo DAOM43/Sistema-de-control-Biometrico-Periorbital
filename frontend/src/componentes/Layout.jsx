@@ -75,7 +75,7 @@ export default function Layout({ usuario, puedeGestionar, esAdmin, onSalir, onSe
           {esAdmin && <NavLink to="/configuracion"><Icono ruta={ICONOS.configuracion} />Configuración</NavLink>}
         </nav>
 
-        <p className="version">v0.1 MVP</p>
+        <p className="version">v1.0</p>
       </aside>
 
       <div className="contenido">

@@ -61,6 +61,9 @@ class Marcacion(Base):
     origen_biometrico: Mapped[bool] = mapped_column(default=True)
     umbral_confianza: Mapped[Decimal | None] = mapped_column(Numeric(5, 4))
     es_prueba: Mapped[bool] = mapped_column(default=False)
+    observacion_horario: Mapped[str | None] = mapped_column(Text)
+    en_horario: Mapped[bool | None]
+    minutos_horario: Mapped[int | None]
     creado_en: Mapped[datetime] = mapped_column(server_default=func.now())
 
 
