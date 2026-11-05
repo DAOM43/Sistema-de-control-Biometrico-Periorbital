@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import obtener_ajustes
-from app.routers import auth, colaboradores, enrolamiento, marcaciones, marcaje
+from app.routers import auth, colaboradores, configuracion, cuentas, enrolamiento, marcaciones, marcaje
 
 app = FastAPI(
     title="Control Biométrico Periorbital",
@@ -18,7 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-for modulo in (auth, colaboradores, enrolamiento, marcaje, marcaciones):
+for modulo in (auth, colaboradores, enrolamiento, marcaje, marcaciones, cuentas, configuracion):
     app.include_router(modulo.router)
 
 

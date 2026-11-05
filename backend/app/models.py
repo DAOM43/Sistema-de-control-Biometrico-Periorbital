@@ -17,6 +17,8 @@ class Usuario(Base):
     rol: Mapped[str] = mapped_column(String(30))
     intentos_fallidos: Mapped[int] = mapped_column(SmallInteger, default=0)
     bloqueado_hasta: Mapped[datetime | None]
+    debe_cambiar_password: Mapped[bool] = mapped_column(default=False)
+    password_actualizado_en: Mapped[datetime] = mapped_column(server_default=func.now())
     creado_en: Mapped[datetime] = mapped_column(server_default=func.now())
 
 

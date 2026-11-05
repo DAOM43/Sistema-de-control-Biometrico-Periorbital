@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 from app.config import obtener_ajustes
 from app.database import obtener_sesion
 from app.models import Usuario
-from app.schemas import Credenciales, TokenSalida, UsuarioSalida
-from app.security import crear_token, usuario_actual, verificar_password
+from app.schemas import CambioPassword, Credenciales, TokenSalida, UsuarioSalida
+from app.security import cifrar_password, crear_token, usuario_actual, verificar_password
 
 router = APIRouter(prefix="/api/auth", tags=["Autenticación"])
 
@@ -41,3 +41,28 @@ def iniciar_sesion(datos: Credenciales, sesion: Session = Depends(obtener_sesion
 @router.get("/yo", response_model=UsuarioSalida)
 def sesion_actual(usuario: Usuario = Depends(usuario_actual)):
     return usuario
+
+
+@router.post("/cambiar-password", response_model=TokenSalida)
+def cambiar_password(
+    datos: CambioPassword,
+    usuario: Usuario = Depends(usuario_actual),
+    sesion: Session = Depends(obtener_sesion),
+):
+    # Solo el administrador cambia su contraseña libremente; las demás cuentas solo tras un restablecimiento.
+    if not usuario.debe_cambiar_password and usuario.rol != "administrador":
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            "Solo el administrador puede asignar una nueva contraseña. Solicítele una contraseña temporal.",
+        )
+    if not verificar_password(datos.actual, usuario.password_hash):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "La contraseña actual no es correcta.")
+    if datos.nueva == datos.actual:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "La contraseña nueva debe ser distinta de la actual.")
+
+    usuario.password_hash = cifrar_password(datos.nueva)
+    usuario.debe_cambiar_password = False
+    usuario.password_actualizado_en = datetime.now()
+    sesion.commit()
+    # El token anterior queda invalidado; se entrega uno nuevo para continuar sin volver a iniciar sesión.
+    return TokenSalida(token=crear_token(usuario), usuario=UsuarioSalida.model_validate(usuario))
